@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import Content from "./Content";
@@ -20,6 +20,9 @@ client_secret=${appsecret}&fb_exchange_token=${accessToken}`;
 };
 
 export default function OutlinedCard(props) {
+  useEffect(() => {
+    postonfb(accessToken);
+  }, [accessToken]);
   const [login, setLogin] = useState(false);
   const [accessToken, setAccessToken] = useState(false);
   const responseFacebook = (response) => {
