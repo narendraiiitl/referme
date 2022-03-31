@@ -9,10 +9,10 @@ import Typography from "@mui/material/Typography";
 import { appid, appsecret } from "../config.js";
 import axios from "axios";
 import FacebookLogin from "react-facebook-login";
-const baseURL = `https://graph.facebook.com/oauth/access_token?grant_type=fb_exchange_token&client_id=${appid}&client_secret=${appsecret}&fb_exchange_token=SHORT-LIVED-USER-ACCESS-TOKEN`;
 
-const postonfb = (data) => {
-  console.log(baseURL);
+const postonfb = (accessToken) => {
+  const baseURL = `https://graph.facebook.com/oauth/access_token?grant_type=fb_exchange_token&client_id=${appid}&
+client_secret=${appsecret}&fb_exchange_token=${accessToken}`;
   axios.get(baseURL).then((response) => {
     console.log(response.data);
   });
@@ -59,12 +59,16 @@ const card = (data) => {
 
 export default function OutlinedCard(props) {
   const [login, setLogin] = useState(false);
+  const [accessToken, setAccessToken] = useState(false);
   const responseFacebook = (response) => {
     console.log(response);
     if (response.accessToken) {
       setLogin(true);
+      setAccessToken(response.accessToken);
+      postonfb(accessToken);
     } else {
       setLogin(false);
+      setAccessToken(false);
     }
   };
   return (
