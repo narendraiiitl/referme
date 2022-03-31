@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useState } from "react";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import Content from "./Content";
@@ -6,7 +6,18 @@ import Button from "@mui/material/Button";
 import TwitterIcon from "@mui/icons-material/Twitter";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
-import FacebookProvider, { ShareButton } from "react-facebook-sdk";
+import { appid, appsecret } from "../config.js";
+import axios from "axios";
+import FacebookLogin from "react-facebook-login";
+const baseURL = `https://graph.facebook.com/oauth/access_token?grant_type=fb_exchange_token&client_id=${appid}&client_secret=${appsecret}&fb_exchange_token=SHORT-LIVED-USER-ACCESS-TOKEN`;
+
+const postonfb = (data) => {
+  console.log(baseURL);
+  axios.get(baseURL).then((response) => {
+    console.log(response.data);
+  });
+};
+
 const card = (data) => {
   return (
     <React.Fragment>
@@ -18,9 +29,6 @@ const card = (data) => {
           alignItems="center"
           spacing={2}
         >
-          <FacebookProvider appId="514390620038471">
-            <ShareButton href="http://www.facebook.com" />
-          </FacebookProvider>
           <Button variant="contained" color="info">
             Message On LinkedIn
           </Button>
@@ -28,7 +36,7 @@ const card = (data) => {
             variant="contained"
             className="darkblue"
             onClick={() => {
-              console.log(data);
+              postonfb();
             }}
           >
             Message On Facebook
@@ -50,10 +58,29 @@ const card = (data) => {
 };
 
 export default function OutlinedCard(props) {
+  const [login, setLogin] = useState(false);
+  const responseFacebook = (response) => {
+    console.log(response);
+    if (response.accessToken) {
+      setLogin(true);
+    } else {
+      setLogin(false);
+    }
+  };
   return (
     <Box sx={{ width: "70%", minWidth: 275 }}>
       <p>{props.obj}</p>
       <Card variant="outlined">{card(props.data)}</Card>
+      {!login && (
+        <FacebookLogin
+          appId="921201001964201"
+          autoLoad={true}
+          fields="name,email,picture"
+          scope="public_profile,user_friends"
+          callback={responseFacebook}
+          icon="fa-facebook"
+        />
+      )}
     </Box>
   );
 }
