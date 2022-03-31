@@ -73,7 +73,7 @@ export default function OutlinedCard(props) {
       <Card variant="outlined">{card(props.data)}</Card>
       {!login && (
         <FacebookLogin
-          appId="921201001964201"
+          appId="691328388673523"
           autoLoad={true}
           fields="name,email,picture"
           scope="public_profile,user_friends"
