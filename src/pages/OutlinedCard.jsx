@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import Content from "./Content";
@@ -6,36 +6,24 @@ import Button from "@mui/material/Button";
 import TwitterIcon from "@mui/icons-material/Twitter";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
-import { appid, appsecret } from "../config.js";
-import axios from "axios";
-import FacebookLogin from "react-facebook-login";
-
-const postonfb = (accessToken) => {
-  console.log(accessToken);
-  const baseURL = `https://graph.facebook.com/oauth/access_token?grant_type=fb_exchange_token&client_id=${appid}&
-client_secret=${appsecret}&fb_exchange_token=${accessToken}`;
-  axios.get(baseURL).then((response) => {
-    console.log(response.data);
-  });
-};
+import {
+  FacebookShareButton,
+  FacebookIcon,
+  TwitterShareButton,
+  LinkedinShareButton,
+  LinkedinIcon,
+} from "react-share";
 
 export default function OutlinedCard(props) {
-  useEffect(() => {
-    postonfb(accessToken);
-  }, [accessToken]);
-  const [login, setLogin] = useState(false);
-  const [accessToken, setAccessToken] = useState(false);
-  const responseFacebook = (response) => {
-    console.log(response);
-    if (response.accessToken) {
-      setLogin(true);
-      setAccessToken(response.accessToken);
-      postonfb(accessToken);
-    } else {
-      setLogin(false);
-      setAccessToken(false);
-    }
-  };
+  const data = `Minimum Qualifications:
+  ${props.data.minQualification}
+
+  Preferred qualifications:
+  ${props.data.prefQualification}
+  `;
+  const [isfb, setIsfb] = useState(false);
+  const [istwitter, setIstwitter] = useState(false);
+
   return (
     <Box sx={{ width: "70%", minWidth: 275 }}>
       <p>{props.obj}</p>
@@ -49,45 +37,54 @@ export default function OutlinedCard(props) {
             alignItems="center"
             spacing={2}
           >
-            <Button variant="contained" color="info">
-              Message On LinkedIn
-            </Button>
-            <Button
-              variant="contained"
-              className="darkblue"
-              onClick={() => {
-                postonfb(accessToken);
+            <LinkedinShareButton url={props.data.link} quote={data}>
+              <Button variant="contained" color="info">
+                Message On LinkedIn
+              </Button>
+            </LinkedinShareButton>
+
+            <FacebookShareButton
+              url={props.data.link}
+              quote={data}
+              className="Demo__some-network__share-button"
+              disabled={isfb}
+              onShareWindowClose={(obj) => {
+                setIsfb(true);
               }}
             >
-              Message On Facebook
-            </Button>
-            <Button
-              variant="contained"
-              color="info"
-              startIcon={<TwitterIcon />}
+              <Button variant="contained" className="darkblue" disabled={isfb}>
+                Message On Facebook
+              </Button>
+            </FacebookShareButton>
+
+            <TwitterShareButton
+              title={data}
+              url={props.data.link}
+              disabled={istwitter}
+              onShareWindowClose={(obj) => {
+                setIstwitter(true);
+              }}
             >
-              Tweet
-            </Button>
+              <Button
+                variant="contained"
+                color="info"
+                startIcon={<TwitterIcon />}
+              >
+                Tweet
+              </Button>
+            </TwitterShareButton>
             <Typography variant="body1" gutterBottom>
               Enable automatic sharing to periodically share your referral link
               on linkedIn
             </Typography>
-            <Button variant="contained" color="info">
-              Auto share On LinkedIn
-            </Button>
+            <LinkedinShareButton url={props.data.link} quote={data}>
+              <Button variant="contained" color="info">
+                Auto share On LinkedIn
+              </Button>
+            </LinkedinShareButton>
           </Stack>
         </Box>
       </Card>
-      {!login && (
-        <FacebookLogin
-          appId="691328388673523"
-          autoLoad={true}
-          fields="name,email,picture"
-          scope="public_profile,user_friends"
-          callback={responseFacebook}
-          icon="fa-facebook"
-        />
-      )}
     </Box>
   );
 }
